@@ -218,7 +218,28 @@ function number_format_i18n( $number, $decimals = 0 ) {
 	if ( isset( $wp_locale ) ) {
 		$formatted = number_format( $number, absint( $decimals ), $wp_locale->number_format['decimal_point'], $wp_locale->number_format['thousands_sep'] );
 	} else {
+<<<<<<< HEAD
 		$formatted = number_format( $number, absint( $decimals ) );
+=======
+		$value = wp_cache_get($setting, 'options');
+
+		if ( false === $value ) {
+			if ( defined('WP_INSTALLING') )
+				$show = $wpdb->hide_errors();
+			$row = $wpdb->get_row("SELECT option_value FROM $wpdb->options WHERE option_name = '$setting' LIMIT 1");
+			if ( defined('WP_INSTALLING') )
+				$wpdb->show_errors($show);
+
+			if( is_object( $row) ) { // Has to be get_row instead of get_var because of funkiness with 0, false, null values
+				$value = $row->option_value;
+				wp_cache_add($setting, $value, 'options');
+			} else { // option does not exist, so we must cache its non-existence
+				$notoptions[$setting] = true;
+				wp_cache_set('notoptions', $notoptions, 'options');
+				return false;
+			}
+		}
+>>>>>>> origin/2.3-branch
 	}
 
 	/**
@@ -260,9 +281,19 @@ function size_format( $bytes, $decimals = 0 ) {
 		'B'  => 1,
 	);
 
+<<<<<<< HEAD
 	if ( 0 === $bytes ) {
 		return number_format_i18n( 0, $decimals ) . ' B';
 	}
+=======
+function get_alloptions() {
+	global $wpdb, $wp_queries;
+	$show = $wpdb->hide_errors();
+	if ( !$options = $wpdb->get_results("SELECT option_name, option_value FROM $wpdb->options WHERE autoload = 'yes'") ) {
+		$options = $wpdb->get_results("SELECT option_name, option_value FROM $wpdb->options");
+	}
+	$wpdb->show_errors($show);
+>>>>>>> origin/2.3-branch
 
 	foreach ( $quant as $unit => $mag ) {
 		if ( doubleval( $bytes ) >= $mag ) {
@@ -286,8 +317,23 @@ function get_weekstartend( $mysqlstring, $start_of_week = '' ) {
 	// MySQL string year.
 	$my = substr( $mysqlstring, 0, 4 );
 
+<<<<<<< HEAD
 	// MySQL string month.
 	$mm = substr( $mysqlstring, 8, 2 );
+=======
+	if ( !$alloptions ) {
+		$show = $wpdb->hide_errors();
+		if ( !$alloptions_db = $wpdb->get_results("SELECT option_name, option_value FROM $wpdb->options WHERE autoload = 'yes'") )
+			$alloptions_db = $wpdb->get_results("SELECT option_name, option_value FROM $wpdb->options");
+		$wpdb->show_errors($show);
+		$alloptions = array();
+		foreach ( (array) $alloptions_db as $o )
+			$alloptions[$o->option_name] = $o->option_value;
+		wp_cache_add('alloptions', $alloptions, 'options');
+	}
+	return $alloptions;
+}
+>>>>>>> origin/2.3-branch
 
 	// MySQL string day.
 	$md = substr( $mysqlstring, 5, 2 );
@@ -936,6 +982,7 @@ function wp_remote_fopen( $uri ) {
 	if ( is_wp_error( $response ) )
 		return false;
 
+<<<<<<< HEAD
 	return wp_remote_retrieve_body( $response );
 }
 
@@ -955,6 +1002,14 @@ function wp( $query_vars = '' ) {
 	$wp->main( $query_vars );
 
 	if ( !isset($wp_the_query) )
+=======
+function wp($query_vars = '') {
+	global $wp, $wp_query, $wp_the_query;
+
+	$wp->main($query_vars);
+
+	if( !isset($wp_the_query) )
+>>>>>>> origin/2.3-branch
 		$wp_the_query = $wp_query;
 }
 
@@ -1351,6 +1406,12 @@ function do_robots() {
  */
 function is_blog_installed() {
 	global $wpdb;
+<<<<<<< HEAD
+=======
+	$show = $wpdb->hide_errors();
+	$installed = $wpdb->get_var("SELECT option_value FROM $wpdb->options WHERE option_name = 'siteurl'");
+	$wpdb->show_errors($show);
+>>>>>>> origin/2.3-branch
 
 	/*
 	 * Check cache first. If options table goes away and we have true
@@ -2237,6 +2298,7 @@ function wp_check_filetype( $filename, $mimes = null ) {
 	return compact( 'ext', 'type' );
 }
 
+<<<<<<< HEAD
 /**
  * Attempt to determine the real file type of a file.
  *
@@ -2601,12 +2663,73 @@ function wp_nonce_ays( $action ) {
 				esc_url( remove_query_arg( 'updated', wp_get_referer() ) ),
 				__( 'Please try again.' )
 			);
+=======
+function wp_explain_nonce($action) {
+	if ( $action !== -1 && preg_match('/([a-z]+)-([a-z]+)(_(.+))?/', $action, $matches) ) {
+		$verb = $matches[1];
+		$noun = $matches[2];
+
+		$trans = array();
+		$trans['update']['attachment'] = array( __( 'Your attempt to edit this attachment: &quot;%s&quot; has failed.' ), 'get_the_title' );
+
+		$trans['add']['category']      = array( __( 'Your attempt to add this category has failed.' ), false );
+		$trans['delete']['category']   = array( __( 'Your attempt to delete this category: &quot;%s&quot; has failed.' ), 'get_catname' );
+		$trans['update']['category']   = array( __( 'Your attempt to edit this category: &quot;%s&quot; has failed.' ), 'get_catname' );
+
+		$trans['delete']['comment']    = array( __( 'Your attempt to delete this comment: &quot;%s&quot; has failed.' ), 'use_id' );
+		$trans['unapprove']['comment'] = array( __( 'Your attempt to unapprove this comment: &quot;%s&quot; has failed.' ), 'use_id' );
+		$trans['approve']['comment']   = array( __( 'Your attempt to approve this comment: &quot;%s&quot; has failed.' ), 'use_id' );
+		$trans['update']['comment']    = array( __( 'Your attempt to edit this comment: &quot;%s&quot; has failed.' ), 'use_id' );
+		$trans['bulk']['comments']     = array( __( 'Your attempt to bulk modify comments has failed.' ), false );
+		$trans['moderate']['comments'] = array( __( 'Your attempt to moderate comments has failed.' ), false );
+
+		$trans['add']['bookmark']      = array( __( 'Your attempt to add this link has failed.' ), false );
+		$trans['delete']['bookmark']   = array( __( 'Your attempt to delete this link: &quot;%s&quot; has failed.' ), 'use_id' );
+		$trans['update']['bookmark']   = array( __( 'Your attempt to edit this link: &quot;%s&quot; has failed.' ), 'use_id' );
+		$trans['bulk']['bookmarks']    = array( __( 'Your attempt to bulk modify links has failed.' ), false );
+
+		$trans['add']['page']          = array( __( 'Your attempt to add this page has failed.' ), false );
+		$trans['delete']['page']       = array( __( 'Your attempt to delete this page: &quot;%s&quot; has failed.' ), 'get_the_title' );
+		$trans['update']['page']       = array( __( 'Your attempt to edit this page: &quot;%s&quot; has failed.' ), 'get_the_title' );
+
+		$trans['edit']['plugin']       = array( __( 'Your attempt to edit this plugin file: &quot;%s&quot; has failed.' ), 'use_id' );
+		$trans['activate']['plugin']   = array( __( 'Your attempt to activate this plugin: &quot;%s&quot; has failed.' ), 'use_id' );
+		$trans['deactivate']['plugin'] = array( __( 'Your attempt to deactivate this plugin: &quot;%s&quot; has failed.' ), 'use_id' );
+
+		$trans['add']['post']          = array( __( 'Your attempt to add this post has failed.' ), false );
+		$trans['delete']['post']       = array( __( 'Your attempt to delete this post: &quot;%s&quot; has failed.' ), 'get_the_title' );
+		$trans['update']['post']       = array( __( 'Your attempt to edit this post: &quot;%s&quot; has failed.' ), 'get_the_title' );
+
+		$trans['add']['user']          = array( __( 'Your attempt to add this user has failed.' ), false );
+		$trans['delete']['users']      = array( __( 'Your attempt to delete users has failed.' ), false );
+		$trans['bulk']['users']        = array( __( 'Your attempt to bulk modify users has failed.' ), false );
+		$trans['update']['user']       = array( __( 'Your attempt to edit this user: &quot;%s&quot; has failed.' ), 'get_author_name' );
+		$trans['update']['profile']    = array( __( 'Your attempt to modify the profile for: &quot;%s&quot; has failed.' ), 'get_author_name' );
+
+		$trans['update']['options']    = array( __( 'Your attempt to edit your settings has failed.' ), false );
+		$trans['update']['permalink']  = array( __( 'Your attempt to change your permalink structure to: %s has failed.' ), 'use_id' );
+		$trans['edit']['file']         = array( __( 'Your attempt to edit this file: &quot;%s&quot; has failed.' ), 'use_id' );
+		$trans['edit']['theme']        = array( __( 'Your attempt to edit this theme file: &quot;%s&quot; has failed.' ), 'use_id' );
+		$trans['switch']['theme']      = array( __( 'Your attempt to switch to this theme: &quot;%s&quot; has failed.' ), 'use_id' );
+
+		if ( isset($trans[$verb][$noun]) ) {
+			if ( !empty($trans[$verb][$noun][1]) ) {
+				$lookup = $trans[$verb][$noun][1];
+				$object = $matches[4];
+				if ( 'use_id' != $lookup )
+					$object = call_user_func( $lookup, $object );
+				return sprintf( $trans[$verb][$noun][0], wp_specialchars($object) );
+			} else {
+				return $trans[$verb][$noun][0];
+			}
+>>>>>>> origin/2.3-branch
 		}
 	}
 
 	wp_die( $html, __( 'WordPress Failure Notice' ), 403 );
 }
 
+<<<<<<< HEAD
 /**
  * Kill WordPress execution and display HTML message with error message.
  *
@@ -2680,6 +2803,17 @@ function wp_die( $message = '', $title = '', $args = array() ) {
 	}
 
 	call_user_func( $function, $message, $title, $args );
+=======
+function wp_nonce_ays($action) {
+	global $pagenow;
+	$title = __( 'WordPress Failure Notice' );
+	$html .= "\t<div id='message' class='updated fade'>\n\t<p>" . wp_specialchars( wp_explain_nonce( $action ) ) . "</p>\n\t<p>";
+	if ( wp_get_referer() )
+		$html .= "<a href='" . remove_query_arg( 'updated', clean_url( wp_get_referer() ) ) . "'>" . __( 'Please try again.' ) . "</a>";
+	$html .= "</p>\n\t</div>\n";
+	$html .= "</body>\n</html>";
+	wp_die( $html, $title );
+>>>>>>> origin/2.3-branch
 }
 
 /**
@@ -3267,6 +3401,7 @@ function _config_wp_home( $url = '' ) {
 	return $url;
 }
 
+<<<<<<< HEAD
 /**
  * Retrieve the WordPress site URL.
  *
@@ -3747,11 +3882,23 @@ function dead_db() {
 	// Load custom DB error template, if present.
 	if ( file_exists( WP_CONTENT_DIR . '/db-error.php' ) ) {
 		require_once( WP_CONTENT_DIR . '/db-error.php' );
+=======
+function dead_db() {
+	global $wpdb;
+
+	// Load custom DB error template, if present.
+	if ( file_exists( ABSPATH . 'wp-content/db-error.php' ) ) {
+		require_once( ABSPATH . 'wp-content/db-error.php' );
+>>>>>>> origin/2.3-branch
 		die();
 	}
 
 	// If installing or in the admin, provide the verbose message.
+<<<<<<< HEAD
 	if ( wp_installing() || defined( 'WP_ADMIN' ) )
+=======
+	if ( defined('WP_INSTALLING') || defined('WP_ADMIN') )
+>>>>>>> origin/2.3-branch
 		wp_die($wpdb->error);
 
 	// Otherwise, be terse.
@@ -3759,6 +3906,7 @@ function dead_db() {
 	nocache_headers();
 	header( 'Content-Type: text/html; charset=utf-8' );
 ?>
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"<?php if ( is_rtl() ) echo ' dir="rtl"'; ?>>
 <head>
@@ -3768,12 +3916,23 @@ function dead_db() {
 </head>
 <body>
 	<h1><?php _e( 'Error establishing a database connection' ); ?></h1>
+=======
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" <?php if ( function_exists( 'language_attributes' ) ) language_attributes(); ?>>
+<head>
+	<title>Database Error</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+	<h1>Error establishing a database connection</h1>
+>>>>>>> origin/2.3-branch
 </body>
 </html>
 <?php
 	die();
 }
 
+<<<<<<< HEAD
 /**
  * Convert a value to non-negative integer.
  *
@@ -5642,3 +5801,6 @@ function wp_cache_get_last_changed( $group ) {
 
 	return $last_changed;
 }
+=======
+?>
+>>>>>>> origin/2.3-branch

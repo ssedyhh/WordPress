@@ -41,7 +41,11 @@
 function redirect_canonical( $requested_url = null, $do_redirect = true ) {
 	global $wp_rewrite, $is_IIS, $wp_query, $wpdb, $wp;
 
+<<<<<<< HEAD
 	if ( isset( $_SERVER['REQUEST_METHOD'] ) && ! in_array( strtoupper( $_SERVER['REQUEST_METHOD'] ), array( 'GET', 'HEAD' ) ) ) {
+=======
+	if ( is_feed() || is_trackback() || is_search() || is_comments_popup() || is_admin() || $is_IIS || ( isset($_POST) && count($_POST) ) || is_preview() )
+>>>>>>> origin/2.3-branch
 		return;
 	}
 

@@ -1254,6 +1254,7 @@ function wp_widget_rss_output( $rss, $args = array() ) {
 		return;
 	}
 
+<<<<<<< HEAD
 	echo '<ul>';
 	foreach ( $rss->get_items( 0, $items ) as $item ) {
 		$link = $item->get_link();
@@ -1261,6 +1262,10 @@ function wp_widget_rss_output( $rss, $args = array() ) {
 			$link = substr( $link, 1 );
 		}
 		$link = esc_url( strip_tags( $link ) );
+=======
+	$dims = array( 'width' => 350, 'height' => 170 );
+	$class = array( 'classname' => 'widget_categories' );
+>>>>>>> origin/2.3-branch
 
 		$title = esc_html( trim( strip_tags( $item->get_title() ) ) );
 		if ( empty( $title ) ) {
@@ -1345,8 +1350,41 @@ function wp_widget_rss_form( $args, $inputs = null ) {
 		echo '<p class="widget-error"><strong>' . __( 'RSS Error:' ) . '</strong> ' . $args['error'] . '</p>';
 	}
 
+<<<<<<< HEAD
 	$esc_number = esc_attr( $args['number'] );
 	if ( $inputs['url'] ) :
+=======
+	echo $after_widget;
+}
+
+function wp_widget_rss_control($number) {
+	$options = $newoptions = get_option('widget_rss');
+	if ( $_POST["rss-submit-$number"] ) {
+		$newoptions[$number]['items'] = (int) $_POST["rss-items-$number"];
+		$url = sanitize_url(strip_tags(stripslashes($_POST["rss-url-$number"])));
+		$newoptions[$number]['title'] = trim(strip_tags(stripslashes($_POST["rss-title-$number"])));
+		if ( $url !== $options[$number]['url'] ) {
+			require_once(ABSPATH . WPINC . '/rss.php');
+			$rss = fetch_rss($url);
+			if ( is_object($rss) ) {
+				$newoptions[$number]['url'] = $url;
+				$newoptions[$number]['error'] = false;
+			} else {
+				$newoptions[$number]['error'] = true;
+				$newoptions[$number]['url'] = wp_specialchars(__('Error: could not find an RSS or ATOM feed at that URL.'), 1);
+				$error = sprintf(__('Error in RSS %1$d: %2$s'), $number, $newoptions[$number]['error']);
+			}
+		}
+	}
+	if ( $options != $newoptions ) {
+		$options = $newoptions;
+		update_option('widget_rss', $options);
+	}
+	$url = attribute_escape($options[$number]['url']);
+	$items = (int) $options[$number]['items'];
+	$title = attribute_escape($options[$number]['title']);
+	if ( empty($items) || $items < 1 ) $items = 10;
+>>>>>>> origin/2.3-branch
 ?>
 	<p><label for="rss-url-<?php echo $esc_number; ?>"><?php _e( 'Enter the RSS feed URL here:' ); ?></label>
 	<input class="widefat" id="rss-url-<?php echo $esc_number; ?>" name="widget-rss[<?php echo $esc_number; ?>][url]" type="text" value="<?php echo esc_url( $args['url'] ); ?>" /></p>

@@ -42,6 +42,7 @@ if ( is_admin() ) {
 	add_filter( 'comment_text', 'wp_kses_post' );
 }
 
+<<<<<<< HEAD
 // Email saves
 foreach ( array( 'pre_comment_author_email', 'pre_user_email' ) as $filter ) {
 	add_filter( $filter, 'trim'           );
@@ -71,6 +72,25 @@ foreach ( array( 'user_url', 'link_url', 'link_image', 'link_rss', 'comment_url'
 	add_filter( $filter, 'esc_url'           );
 	if ( is_admin() )
 		add_filter( $filter, 'wp_kses_data'    );
+=======
+// Save URL
+$filters = array('pre_comment_author_url', 'pre_user_url', 'pre_link_url', 'pre_link_image',
+	'pre_link_rss');
+foreach ( $filters as $filter ) {
+	add_filter($filter, 'strip_tags');
+	add_filter($filter, 'trim');
+	add_filter($filter, 'sanitize_url');
+	add_filter($filter, 'wp_filter_kses');
+}
+
+// Display URL
+$filters = array('user_url', 'link_url', 'link_image', 'link_rss', 'comment_url');
+foreach ( $filters as $filter ) {
+	add_filter($filter, 'strip_tags');
+	add_filter($filter, 'trim');
+	add_filter($filter, 'clean_url');
+	add_filter($filter, 'wp_filter_kses');
+>>>>>>> origin/2.3-branch
 }
 
 // Slugs
@@ -235,6 +255,7 @@ add_action( 'auth_cookie_valid',          'rest_cookie_collect_status' );
 add_filter( 'rest_authentication_errors', 'rest_cookie_check_errors', 100 );
 
 // Actions
+<<<<<<< HEAD
 add_action( 'wp_head',             '_wp_render_title_tag',            1     );
 add_action( 'wp_head',             'wp_enqueue_scripts',              1     );
 add_action( 'wp_head',             'wp_resource_hints',               2     );
@@ -326,6 +347,34 @@ add_action( 'transition_post_status',     '_wp_auto_add_pages_to_menu', 10, 3 );
 add_action( 'begin_fetch_post_thumbnail_html', '_wp_post_thumbnail_class_filter_add'    );
 add_action( 'end_fetch_post_thumbnail_html',   '_wp_post_thumbnail_class_filter_remove' );
 
+=======
+add_action('wp_head', 'rsd_link');
+add_action('wp_head', 'wlwmanifest_link');
+add_action('wp_head', 'locale_stylesheet');
+add_action('publish_future_post', 'wp_publish_post', 10, 1);
+add_action('wp_head', 'noindex', 1);
+add_action('wp_head', 'wp_print_scripts');
+if(!defined('DOING_CRON'))
+	add_action('init', 'wp_cron');
+add_action('do_feed_rdf', 'do_feed_rdf', 10, 1);
+add_action('do_feed_rss', 'do_feed_rss', 10, 1);
+add_action('do_feed_rss2', 'do_feed_rss2', 10, 1);
+add_action('do_feed_atom', 'do_feed_atom', 10, 1);
+add_action('do_pings', 'do_all_pings', 10, 1);
+add_action('do_robots', 'do_robots');
+add_action('sanitize_comment_cookies', 'sanitize_comment_cookies');
+add_action('admin_print_scripts', 'wp_print_scripts', 20);
+add_action('mce_options', '_mce_set_direction');
+add_action('init', 'smilies_init', 5);
+add_action( 'plugins_loaded', 'wp_maybe_load_widgets', 0 );
+add_action( 'shutdown', 'wp_ob_end_flush_all', 1);
+add_action('publish_post', '_publish_post_hook', 5, 1);
+add_action('future_post', '_future_post_hook', 5, 2);
+add_action('future_page', '_future_post_hook', 5, 2);
+add_action('save_post', '_save_post_hook', 5, 2);
+add_action('transition_post_status', '_transition_post_status', 5, 3);
+add_action('comment_form', 'wp_comment_form_unfiltered_html_nonce');
+>>>>>>> origin/2.3-branch
 // Redirect Old Slugs
 add_action( 'template_redirect',  'wp_old_slug_redirect'              );
 add_action( 'post_updated',       'wp_check_for_changed_slugs', 12, 3 );
@@ -504,4 +553,8 @@ add_filter( 'oembed_dataparse',       'wp_filter_oembed_result',        10, 3 );
 add_filter( 'oembed_response_data',   'get_oembed_response_data_rich',  10, 4 );
 add_filter( 'pre_oembed_result',      'wp_filter_pre_oembed_result',    10, 3 );
 
+<<<<<<< HEAD
 unset( $filter, $action );
+=======
+?>
+>>>>>>> origin/2.3-branch

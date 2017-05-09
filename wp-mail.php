@@ -47,8 +47,13 @@ $phone_delim = '::';
 
 $pop3 = new POP3();
 
+<<<<<<< HEAD
 if ( !$pop3->connect( get_option('mailserver_url'), get_option('mailserver_port') ) || !$pop3->user( get_option('mailserver_login') ) )
 	wp_die( esc_html( $pop3->ERROR ) );
+=======
+if (!$pop3->connect(get_option('mailserver_url'), get_option('mailserver_port')))
+	wp_die(wp_specialchars($pop3->ERROR));
+>>>>>>> origin/2.3-branch
 
 $count = $pop3->pass( get_option('mailserver_pass') );
 
@@ -113,23 +118,62 @@ for ( $i = 1; $i <= $count; $i++ ) {
 				$subject = $subject[0];
 			}
 
+<<<<<<< HEAD
 			/*
 			 * Set the author using the email address (From or Reply-To, the last used)
 			 * otherwise use the site admin.
 			 */
 			if ( ! $author_found && preg_match( '/^(From|Reply-To): /', $line ) ) {
+=======
+			// Set the author using the email address (From or Reply-To, the last used)
+			// otherwise use the site admin
+			if ( preg_match('/(From|Reply-To): /', $line) )  {
+>>>>>>> origin/2.3-branch
 				if ( preg_match('|[a-z0-9_.-]+@[a-z0-9_.-]+(?!.*<)|i', $line, $matches) )
 					$author = $matches[0];
 				else
 					$author = trim($line);
 				$author = sanitize_email($author);
 				if ( is_email($author) ) {
+<<<<<<< HEAD
 					/* translators: Post author email address */
 					echo '<p>' . sprintf(__('Author is %s'), $author) . '</p>';
 					$userdata = get_user_by('email', $author);
 					if ( ! empty( $userdata ) ) {
 						$post_author = $userdata->ID;
 						$author_found = true;
+=======
+					echo "Author = {$author} <p>";
+					$author = $wpdb->escape($author);
+					$result = $wpdb->get_row("SELECT ID FROM $wpdb->users WHERE user_email='$author' LIMIT 1");
+					if (!$result)
+						$post_author = 1;
+					else
+						$post_author = $result->ID;
+				} else
+					$post_author = 1;
+			}
+
+			if (preg_match('/Date: /i', $line)) { // of the form '20 Mar 2002 20:32:37'
+				$ddate = trim($line);
+				$ddate = str_replace('Date: ', '', $ddate);
+				if (strpos($ddate, ',')) {
+					$ddate = trim(substr($ddate, strpos($ddate, ',')+1, strlen($ddate)));
+				}
+				$date_arr = explode(' ', $ddate);
+				$date_time = explode(':', $date_arr[3]);
+
+				$ddate_H = $date_time[0];
+				$ddate_i = $date_time[1];
+				$ddate_s = $date_time[2];
+
+				$ddate_m = $date_arr[1];
+				$ddate_d = $date_arr[0];
+				$ddate_Y = $date_arr[2];
+				for ($j=0; $j<12; $j++) {
+					if ($ddate_m == $dmonths[$j]) {
+						$ddate_m = $j+1;
+>>>>>>> origin/2.3-branch
 					}
 				}
 			}
@@ -190,7 +234,11 @@ for ( $i = 1; $i <= $count; $i++ ) {
 
 	// Captures any text in the body after $phone_delim as the body
 	$content = explode($phone_delim, $content);
+<<<<<<< HEAD
 	$content = empty( $content[1] ) ? $content[0] : $content[1];
+=======
+	$content[1] ? $content = $content[1] : $content = $content[0];
+>>>>>>> origin/2.3-branch
 
 	$content = trim($content);
 
@@ -229,6 +277,7 @@ for ( $i = 1; $i <= $count; $i++ ) {
 	 */
 	do_action( 'publish_phone', $post_ID );
 
+<<<<<<< HEAD
 	echo "\n<p><strong>" . __( 'Author:' ) . '</strong> ' . esc_html( $post_author ) . '</p>';
 	echo "\n<p><strong>" . __( 'Posted title:' ) . '</strong> ' . esc_html( $post_title ) . '</p>';
 
@@ -238,6 +287,13 @@ for ( $i = 1; $i <= $count; $i++ ) {
 			__( 'Oops: %s' ),
 			esc_html( $pop3->ERROR )
 		) . '</p>';
+=======
+	echo "\n<p><b>Author:</b> " . wp_specialchars($post_author) . "</p>";
+	echo "\n<p><b>Posted title:</b> " . wp_specialchars($post_title) . "<br />";
+
+	if(!$pop3->delete($i)) {
+		echo '<p>Oops '.wp_specialchars($pop3->ERROR).'</p></div>';
+>>>>>>> origin/2.3-branch
 		$pop3->reset();
 		exit;
 	} else {

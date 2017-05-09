@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 /**
  * WordPress Administration Bootstrap
  *
@@ -17,6 +18,14 @@ if ( ! defined( 'WP_ADMIN' ) ) {
 
 if ( ! defined('WP_NETWORK_ADMIN') )
 	define('WP_NETWORK_ADMIN', false);
+=======
+define('WP_ADMIN', TRUE);
+
+if ( defined('ABSPATH') )
+	require_once( ABSPATH . 'wp-config.php');
+else
+    require_once('../wp-config.php');
+>>>>>>> origin/2.3-branch
 
 if ( ! defined('WP_USER_ADMIN') )
 	define('WP_USER_ADMIN', false);

@@ -151,6 +151,7 @@ function list_files( $folder = '', $levels = 100 ) {
 	return $files;
 }
 
+<<<<<<< HEAD
 /**
  * Returns a filename of a Temporary unique file.
  * Please note that the calling function must unlink() this itself.
@@ -168,6 +169,14 @@ function wp_tempnam( $filename = '', $dir = '' ) {
 	if ( empty( $dir ) ) {
 		$dir = get_temp_dir();
 	}
+=======
+function validate_file( $file, $allowed_files = '' ) {
+	if ( false !== strpos( $file, '..' ))
+		return 1;
+
+	if ( false !== strpos( $file, './' ))
+		return 1;
+>>>>>>> origin/2.3-branch
 
 	if ( empty( $filename ) || '.' == $filename || '/' == $filename || '\\' == $filename ) {
 		$filename = time();

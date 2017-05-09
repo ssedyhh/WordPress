@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 /**
  * Plugins may load this file to gain access to special helper functions for
  * plugin installation. This file is not included by WordPress and it is
@@ -36,6 +37,10 @@
 
 /** Load WordPress Bootstrap */
 require_once(dirname(dirname(__FILE__)).'/wp-load.php');
+=======
+require_once(dirname(dirname(__FILE__)).'/wp-config.php');
+$debug = 0;
+>>>>>>> origin/2.3-branch
 
 if ( ! function_exists('maybe_create_table') ) :
 /**
@@ -198,3 +203,9 @@ function check_column($table_name, $col_name, $col_type, $is_null = null, $key =
 	}
 	return false;
 }
+<<<<<<< HEAD
+=======
+echo "</pre>";
+*/
+?>
+>>>>>>> origin/2.3-branch

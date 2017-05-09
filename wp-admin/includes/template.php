@@ -104,6 +104,19 @@ function wp_terms_checklist( $post_id = 0, $args = array() ) {
 	} else {
 		$walker = $r['walker'];
 	}
+<<<<<<< HEAD
+=======
+}
+
+function _cat_row( $category, $level, $name_override = false ) {
+	global $class;
+
+	$pad = str_repeat( '&#8212; ', $level );
+	if ( current_user_can( 'manage_categories' ) ) {
+		$edit = "<a href='categories.php?action=edit&amp;cat_ID=$category->term_id' class='edit'>".__( 'Edit' )."</a></td>";
+		$default_cat_id = (int) get_option( 'default_category' );
+		$default_link_cat_id = (int) get_option( 'default_link_category' );
+>>>>>>> origin/2.3-branch
 
 	$taxonomy = $r['taxonomy'];
 	$descendants_and_self = (int) $r['descendants_and_self'];
@@ -805,7 +818,11 @@ function parent_dropdown( $default = 0, $parent = 0, $level = 0, $post = null ) 
 			$pad = str_repeat( '&nbsp;', $level * 3 );
 			$selected = selected( $default, $item->ID, false );
 
+<<<<<<< HEAD
 			echo "\n\t<option class='level-$level' value='$item->ID' $selected>$pad " . esc_html($item->post_title) . "</option>";
+=======
+			echo "\n\t<option value='$item->ID'$current>$pad " . wp_specialchars($item->post_title) . "</option>";
+>>>>>>> origin/2.3-branch
 			parent_dropdown( $default, $item->ID, $level +1 );
 		}
 	} else {

@@ -2367,11 +2367,19 @@ function dbDelta( $queries = '', $execute = true ) {
 						if ( array_search( $fieldtype_lowercased, $text_fields ) < array_search( $tablefield_type_lowercased, $text_fields ) ) {
 							$do_change = false;
 						}
+<<<<<<< HEAD
 					}
 
 					if ( in_array( $fieldtype_lowercased, $blob_fields ) && in_array( $tablefield_type_lowercased, $blob_fields ) ) {
 						if ( array_search( $fieldtype_lowercased, $blob_fields ) < array_search( $tablefield_type_lowercased, $blob_fields ) ) {
 							$do_change = false;
+=======
+						// Add the column list to the index create string
+						$index_string .= ' ('.$index_columns.')';
+						if(!(($aindex = array_search($index_string, $indices)) === false)) {
+							unset($indices[$aindex]);
+							//echo "<pre style=\"border:1px solid #ccc;margin-top:5px;\">{$table}:<br />Found index:".$index_string."</pre>\n";
+>>>>>>> origin/2.3-branch
 						}
 					}
 

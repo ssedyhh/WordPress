@@ -5,9 +5,14 @@
   <options>
     <clientType>WordPress</clientType>
 	<supportsKeywords>Yes</supportsKeywords>
+<<<<<<< HEAD
 	<supportsGetTags>Yes</supportsGetTags>
   </options>
 
+=======
+  </options>
+  
+>>>>>>> origin/2.3-branch
   <weblog>
     <serviceName>WordPress</serviceName>
     <imageUrl>images/wlw/wp-icon.png</imageUrl>
@@ -15,6 +20,7 @@
     <homepageLinkText>View site</homepageLinkText>
     <adminLinkText>Dashboard</adminLinkText>
     <adminUrl>
+<<<<<<< HEAD
       <![CDATA[
 			{blog-postapi-url}/../wp-admin/
 		]]>
@@ -22,6 +28,15 @@
     <postEditingUrl>
       <![CDATA[
 			{blog-postapi-url}/../wp-admin/post.php?action=edit&post={post-id}
+=======
+      <![CDATA[ 
+			{blog-postapi-url}/../wp-admin/ 
+		]]>
+    </adminUrl>
+    <postEditingUrl>
+      <![CDATA[ 
+			{blog-postapi-url}/../wp-admin/post.php?action=edit&post={post-id} 
+>>>>>>> origin/2.3-branch
 		]]>
     </postEditingUrl>
   </weblog>
@@ -32,7 +47,11 @@
       <text>Manage Comments</text>
       <imageUrl>images/wlw/wp-comments.png</imageUrl>
       <clickUrl>
+<<<<<<< HEAD
         <![CDATA[
+=======
+        <![CDATA[ 
+>>>>>>> origin/2.3-branch
 				{blog-postapi-url}/../wp-admin/edit-comments.php
 			]]>
       </clickUrl>
@@ -41,3 +60,7 @@
   </buttons>
 
 </manifest>
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/2.3-branch

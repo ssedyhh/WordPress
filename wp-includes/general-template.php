@@ -3006,6 +3006,7 @@ function user_can_richedit() {
 	return apply_filters( 'user_can_richedit', $wp_rich_edit );
 }
 
+<<<<<<< HEAD
 /**
  * Find out which editor should be displayed by default.
  *
@@ -3031,6 +3032,17 @@ function wp_default_editor() {
 	 * @param string $r Which editor should be displayed by default. Either 'tinymce', 'html', or 'test'.
 	 */
 	return apply_filters( 'wp_default_editor', $r );
+=======
+function wlwmanifest_link() {
+	echo ' <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="'
+		. get_bloginfo('wpurl') . '/wp-includes/wlwmanifest.xml" /> ';
+}
+
+function noindex() {
+	// If the blog is not public, tell robots to go away.
+	if ( '0' == get_option('blog_public') )
+		echo "<meta name='robots' content='noindex,nofollow' />\n";
+>>>>>>> origin/2.3-branch
 }
 
 /**

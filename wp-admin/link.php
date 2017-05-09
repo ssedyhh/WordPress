@@ -12,12 +12,19 @@
 /** Load WordPress Administration Bootstrap */
 require_once( dirname( __FILE__ ) . '/admin.php' );
 
+<<<<<<< HEAD
 wp_reset_vars( array( 'action', 'cat_id', 'link_id' ) );
 
 if ( ! current_user_can('manage_links') )
 	wp_link_manager_disabled_message();
 
 if ( !empty($_POST['deletebookmarks']) )
+=======
+if ( ! current_user_can('manage_links') )
+	wp_die( __('You do not have sufficient permissions to edit the links for this blog.') );
+
+if ('' != $_POST['deletebookmarks'])
+>>>>>>> origin/2.3-branch
 	$action = 'deletebookmarks';
 if ( !empty($_POST['move']) )
 	$action = 'move';
@@ -30,7 +37,11 @@ switch ($action) {
 	case 'deletebookmarks' :
 		check_admin_referer('bulk-bookmarks');
 
+<<<<<<< HEAD
 		// For each link id (in $linkcheck[]) change category to selected value.
+=======
+		//for each link id (in $linkcheck[]) change category to selected value
+>>>>>>> origin/2.3-branch
 		if (count($linkcheck) == 0) {
 			wp_redirect($this_file);
 			exit;
@@ -50,7 +61,11 @@ switch ($action) {
 	case 'move' :
 		check_admin_referer('bulk-bookmarks');
 
+<<<<<<< HEAD
 		// For each link id (in $linkcheck[]) change category to selected value.
+=======
+		//for each link id (in $linkcheck[]) change category to selected value
+>>>>>>> origin/2.3-branch
 		if (count($linkcheck) == 0) {
 			wp_redirect($this_file);
 			exit;
@@ -71,7 +86,11 @@ switch ($action) {
 		if ( add_link() )
 			$redir = add_query_arg( 'added', 'true', $redir );
 
+<<<<<<< HEAD
 		wp_redirect( $redir );
+=======
+		wp_redirect( wp_get_referer() . '?added=true' );
+>>>>>>> origin/2.3-branch
 		exit;
 
 	case 'save' :
@@ -108,10 +127,20 @@ switch ($action) {
 		if (!$link = get_link_to_edit($link_id))
 			wp_die(__('Link not found.'));
 
+<<<<<<< HEAD
 		include( ABSPATH . 'wp-admin/edit-link-form.php' );
 		include( ABSPATH . 'wp-admin/admin-footer.php' );
+=======
+		include_once ('admin-header.php');
+		include ('edit-link-form.php');
+		include ('admin-footer.php');
+>>>>>>> origin/2.3-branch
 		break;
 
 	default :
 		break;
 }
+<<<<<<< HEAD
+=======
+?>
+>>>>>>> origin/2.3-branch

@@ -51,6 +51,7 @@ define( 'ARRAY_N', 'ARRAY_N' );
  */
 class wpdb {
 
+<<<<<<< HEAD
 	/**
 	 * Whether to show SQL/DB errors.
 	 *
@@ -2580,6 +2581,14 @@ class wpdb {
 		if ( empty( $this->col_meta[ $tablekey ][ $columnkey ] ) ) {
 			return $this->table_charset[ $tablekey ];
 		}
+=======
+	var $show_errors = false;
+	var $num_queries = 0;
+	var $last_query;
+	var $col_info;
+	var $queries;
+	var $ready = false;
+>>>>>>> origin/2.3-branch
 
 		// Return false when it's not a string column.
 		if ( empty( $this->col_meta[ $tablekey ][ $columnkey ]->Collation ) ) {
@@ -2620,12 +2629,21 @@ class wpdb {
 			}
 		}
 
+<<<<<<< HEAD
 		if ( empty( $this->col_meta[ $tablekey ][ $columnkey ] ) ) {
 			return false;
 		}
+=======
+		if ( defined('WP_DEBUG') and WP_DEBUG == true )
+			$this->show_errors();
+
+		if ( defined('DB_CHARSET') )
+			$this->charset = DB_CHARSET;
+>>>>>>> origin/2.3-branch
 
 		$typeinfo = explode( '(', $this->col_meta[ $tablekey ][ $columnkey ]->Type );
 
+<<<<<<< HEAD
 		$type = strtolower( $typeinfo[0] );
 		if ( ! empty( $typeinfo[1] ) ) {
 			$length = trim( $typeinfo[1], ')' );
@@ -2640,6 +2658,27 @@ class wpdb {
 					'type'   => 'char',
 					'length' => (int) $length,
 				);
+=======
+		$this->dbh = @mysql_connect($dbhost, $dbuser, $dbpassword);
+		if (!$this->dbh) {
+			$this->bail("
+<h1>Error establishing a database connection</h1>
+<p>This either means that the username and password information in your <code>wp-config.php</code> file is incorrect or we can't contact the database server at <code>$dbhost</code>. This could mean your host's database server is down.</p>
+<ul>
+	<li>Are you sure you have the correct username and password?</li>
+	<li>Are you sure that you have typed the correct hostname?</li>
+	<li>Are you sure that the database server is running?</li>
+</ul>
+<p>If you're unsure what these terms mean you should probably contact your host. If you still need help you can always visit the <a href='http://wordpress.org/support/'>WordPress Support Forums</a>.</p>
+");
+			return;
+		}
+
+		$this->ready = true;
+
+		if ( !empty($this->charset) && version_compare(mysql_get_server_info(), '4.1.0', '>=') )
+ 			$this->query("SET NAMES '$this->charset'");
+>>>>>>> origin/2.3-branch
 
 			case 'binary':
 			case 'varbinary':
@@ -2655,6 +2694,7 @@ class wpdb {
 					'length' => 255,        // 2^8 - 1
 				);
 
+<<<<<<< HEAD
 			case 'blob':
 			case 'text':
 				return array(
@@ -2678,6 +2718,25 @@ class wpdb {
 
 			default:
 				return false;
+=======
+	/**
+	 * Selects a database using the current class's $this->dbh
+	 * @param string $db name
+	 */
+	function select($db) {
+		if (!@mysql_select_db($db, $this->dbh)) {
+			$this->ready = false;
+			$this->bail("
+<h1>Can&#8217;t select database</h1>
+<p>We were able to connect to the database server (which means your username and password is okay) but not able to select the <code>$db</code> database.</p>
+<ul>
+<li>Are you sure it exists?</li>
+<li>Does the user <code>".DB_USER."</code> have permission to use the <code>$db</code> database?</li>
+<li>On some systems the name of your database is prefixed with your username, so it would be like username_wordpress. Could that be the problem?</li>
+</ul>
+<p>If you don't know how to setup a database you should <strong>contact your host</strong>. If all else fails you may find help at the <a href='http://wordpress.org/support/'>WordPress Support Forums</a>.</p>");
+			return;
+>>>>>>> origin/2.3-branch
 		}
 	}
 
@@ -2730,15 +2789,41 @@ class wpdb {
 			return true;
 		}
 
+<<<<<<< HEAD
 		$table = $this->get_table_from_query( $query );
 		if ( ! $table ) {
 			return false;
 		}
+=======
+	function print_error($str = '') {
+		global $EZSQL_ERROR;
+		if (!$str) $str = mysql_error($this->dbh);
+		$EZSQL_ERROR[] =
+		array ('query' => $this->last_query, 'error_str' => $str);
+
+		$error_str = "WordPress database error $str for query $this->last_query";
+		error_log($error_str, 0);
+
+		// Is error output turned on or not..
+		if ( !$this->show_errors )
+			return false;
+
+		$str = htmlspecialchars($str, ENT_QUOTES);
+		$query = htmlspecialchars($this->last_query, ENT_QUOTES);
+
+		// If there is an error then take note of it
+		print "<div id='error'>
+		<p class='wpdberror'><strong>WordPress database error:</strong> [$str]<br />
+		<code>$query</code></p>
+		</div>";
+	}
+>>>>>>> origin/2.3-branch
 
 		$this->checking_collation = true;
 		$collation = $this->get_table_charset( $table );
 		$this->checking_collation = false;
 
+<<<<<<< HEAD
 		// Tables with no collation, or latin1 only, don't need extra checking.
 		if ( false === $collation || 'latin1' === $collation ) {
 			return true;
@@ -2754,6 +2839,19 @@ class wpdb {
 			if ( empty( $col->Collation ) ) {
 				continue;
 			}
+=======
+	function show_errors( $show = true ) {
+		$errors = $this->show_errors;
+		$this->show_errors = $show;
+		return $errors;
+	}
+
+	function hide_errors() {
+		$show = $this->show_errors;
+		$this->show_errors = false;
+		return $show;
+	}
+>>>>>>> origin/2.3-branch
 
 			if ( ! in_array( $col->Collation, array( 'utf8_general_ci', 'utf8_bin', 'utf8mb4_general_ci', 'utf8mb4_bin' ), true ) ) {
 				return false;
@@ -2780,8 +2878,19 @@ class wpdb {
 	protected function strip_invalid_text( $data ) {
 		$db_check_string = false;
 
+<<<<<<< HEAD
 		foreach ( $data as &$value ) {
 			$charset = $value['charset'];
+=======
+	function query($query) {
+		if ( ! $this->ready )
+			return false;
+
+		// filter the query, if filters are available
+		// NOTE: some queries are made before the plugins have been loaded, and thus cannot be filtered with this method
+		if ( function_exists('apply_filters') )
+			$query = apply_filters('query', $query);
+>>>>>>> origin/2.3-branch
 
 			if ( is_array( $value['length'] ) ) {
 				$length = $value['length']['length'];
@@ -3161,6 +3270,7 @@ class wpdb {
 	 * @param string $error_code Optional. A Computer readable string to identify the error.
 	 * @return false|void
 	 */
+<<<<<<< HEAD
 	public function bail( $message, $error_code = '500' ) {
 		if ( !$this->show_errors ) {
 			if ( class_exists( 'WP_Error', false ) ) {
@@ -3168,11 +3278,20 @@ class wpdb {
 			} else {
 				$this->error = $message;
 			}
+=======
+	function bail($message) { // Just wraps errors in a nice header and footer
+		if ( !$this->show_errors ) {
+			if ( class_exists('WP_Error') )
+				$this->error = new WP_Error('500', $message);
+			else
+				$this->error = $message;
+>>>>>>> origin/2.3-branch
 			return false;
 		}
 		wp_die($message);
 	}
 
+<<<<<<< HEAD
 
 	/**
 	 * Closes the current database connection.
@@ -3338,3 +3457,8 @@ class wpdb {
 		return preg_replace( '/[^0-9.].*/', '', $server_info );
 	}
 }
+=======
+if ( ! isset($wpdb) )
+	$wpdb = new wpdb(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
+?>
+>>>>>>> origin/2.3-branch

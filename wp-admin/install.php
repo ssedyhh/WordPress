@@ -38,6 +38,7 @@ require_once( dirname( dirname( __FILE__ ) ) . '/wp-load.php' );
 /** Load WordPress Administration Upgrade API */
 require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
+<<<<<<< HEAD
 /** Load WordPress Translation Install API */
 require_once( ABSPATH . 'wp-admin/includes/translation-install.php' );
 
@@ -63,6 +64,14 @@ function display_header( $body_classes = '' ) {
 	if ( $body_classes ) {
 		$body_classes = ' ' . $body_classes;
 	}
+=======
+if (isset($_GET['step']))
+	$step = $_GET['step'];
+else
+	$step = 0;
+function display_header(){
+header( 'Content-Type: text/html; charset=utf-8' );
+>>>>>>> origin/2.3-branch
 ?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" <?php language_attributes(); ?>>
@@ -76,6 +85,7 @@ function display_header( $body_classes = '' ) {
 		wp_admin_css( 'dashicons', true );
 	?>
 </head>
+<<<<<<< HEAD
 <body class="wp-core-ui<?php echo $body_classes ?>">
 <p id="logo"><a href="<?php echo esc_url( __( 'https://wordpress.org/' ) ); ?>" tabindex="-1"><?php _e( 'WordPress' ); ?></a></p>
 
@@ -91,6 +101,25 @@ function display_header( $body_classes = '' ) {
  */
 function display_setup_form( $error = null ) {
 	global $wpdb;
+=======
+<body>
+<h1 id="logo"><img alt="WordPress" src="images/wordpress-logo.png" /></h1>
+
+<?php
+}//end function display_header();
+
+// Let's check to make sure WP isn't already installed.
+if ( is_blog_installed() ) {display_header(); die('<h1>'.__('Already Installed').'</h1><p>'.__('You appear to have already installed WordPress. To reinstall please clear your old database tables first.').'</p></body></html>');}
+
+switch($step) {
+	case 0:
+	case 1: // in case people are directly linking to this
+	  display_header();
+?>
+<h1><?php _e('Welcome'); ?></h1>
+<p><?php printf(__('Welcome to the famous five minute WordPress installation process! You may want to browse the <a href="%s">ReadMe documentation</a> at your leisure.  Otherwise, just fill in the information below and you\'ll be on your way to using the most extendable and powerful personal publishing platform in the world.'), '../readme.html'); ?></p>
+<!--<h2 class="step"><a href="install.php?step=1"><?php _e('First Step &raquo;'); ?></a></h2>-->
+>>>>>>> origin/2.3-branch
 
 	$sql = $wpdb->prepare( "SHOW TABLES LIKE %s", $wpdb->esc_like( $wpdb->users ) );
 	$user_table = ( $wpdb->get_var( $sql ) != null );
@@ -322,6 +351,7 @@ switch($step) {
 		display_setup_form();
 		break;
 	case 2:
+<<<<<<< HEAD
 		if ( ! empty( $language ) && load_default_textdomain( $language ) ) {
 			$loaded_language = $language;
 			$GLOBALS['wp_locale'] = new WP_Locale();
@@ -335,6 +365,12 @@ switch($step) {
 		$scripts_to_print[] = 'user-profile';
 
 		display_header();
+=======
+		if ( !empty($wpdb->error) )
+			wp_die($wpdb->error->get_error_message());
+
+		display_header();	
+>>>>>>> origin/2.3-branch
 		// Fill in the data we gathered
 		$weblog_title = isset( $_POST['weblog_title'] ) ? trim( wp_unslash( $_POST['weblog_title'] ) ) : '';
 		$user_name = isset($_POST['user_name']) ? trim( wp_unslash( $_POST['user_name'] ) ) : '';
@@ -366,9 +402,15 @@ switch($step) {
 			$error = true;
 		}
 
+<<<<<<< HEAD
 		if ( $error === false ) {
 			$wpdb->show_errors();
 			$result = wp_install( $weblog_title, $user_name, $admin_email, $public, '', wp_slash( $admin_password ), $loaded_language );
+=======
+		$wpdb->show_errors();
+		$result = wp_install($weblog_title, 'admin', $admin_email, $public);
+		extract($result, EXTR_SKIP);
+>>>>>>> origin/2.3-branch
 ?>
 
 <h1><?php _e( 'Success!' ); ?></h1>

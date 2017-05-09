@@ -128,7 +128,38 @@ function cache_users( $user_ids ) {
 
 	$list = implode( ',', $clean );
 
+<<<<<<< HEAD
 	$users = $wpdb->get_results( "SELECT * FROM $wpdb->users WHERE ID IN ($list)" );
+=======
+	$show = $wpdb->hide_errors();
+	$metavalues = $wpdb->get_results("SELECT meta_key, meta_value FROM $wpdb->usermeta WHERE user_id = '$user_id'");
+	$wpdb->show_errors($show);
+
+	if ($metavalues) {
+		foreach ( $metavalues as $meta ) {
+			$value = maybe_unserialize($meta->meta_value);
+			$user->{$meta->meta_key} = $value;
+
+			// We need to set user_level from meta, not row
+			if ( $wpdb->prefix . 'user_level' == $meta->meta_key )
+				$user->user_level = $meta->meta_value;
+		} // end foreach
+	} //end if
+
+	// For backwards compat.
+	if ( isset($user->first_name) )
+		$user->user_firstname = $user->first_name;
+	if ( isset($user->last_name) )
+		$user->user_lastname = $user->last_name;
+	if ( isset($user->description) )
+		$user->user_description = $user->description;
+
+	wp_cache_add($user_id, $user, 'users');
+	wp_cache_add($user->user_login, $user_id, 'userlogins');
+	return $user;
+}
+endif;
+>>>>>>> origin/2.3-branch
 
 	$ids = array();
 	foreach ( $users as $user ) {
@@ -1325,9 +1356,14 @@ function wp_validate_redirect($location, $default = '') {
 	// @-operator is used to prevent possible warnings in PHP < 5.3.3.
 	$lp = @parse_url($test);
 
+<<<<<<< HEAD
 	// Give up if malformed URL
 	if ( false === $lp )
 		return $default;
+=======
+	if ( isset($lp['host']) && ( !in_array($lp['host'], $allowed_hosts) && $lp['host'] != strtolower($wpp['host'])) )
+		$location = get_option('siteurl') . '/wp-admin/';
+>>>>>>> origin/2.3-branch
 
 	// Allow only http and https schemes. No data:, etc.
 	if ( isset($lp['scheme']) && !('http' == $lp['scheme'] || 'https' == $lp['scheme']) )

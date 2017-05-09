@@ -1363,3 +1363,27 @@ function script_concat_settings() {
 			$compress_css = false;
 	}
 }
+<<<<<<< HEAD
+=======
+
+function wp_prototype_before_jquery( $js_array ) {
+	if ( false === $jquery = array_search( 'jquery', $js_array ) )
+		return $js_array;
+
+	if ( false === $prototype = array_search( 'prototype', $js_array ) )
+		return $js_array;
+
+	if ( $prototype < $jquery )
+		return $js_array;
+
+	unset($js_array[$prototype]);
+
+	array_splice( $js_array, $jquery, 0, 'prototype' );
+
+	return $js_array;
+}
+
+add_filter( 'print_scripts_array', 'wp_prototype_before_jquery' );
+
+?>
+>>>>>>> origin/2.3-branch

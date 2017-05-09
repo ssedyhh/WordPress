@@ -494,6 +494,7 @@ function get_extended( $post ) {
 	return array( 'main' => $main, 'extended' => $extended, 'more_text' => $more_text );
 }
 
+<<<<<<< HEAD
 /**
  * Retrieves post data given a post ID or post object.
  *
@@ -526,6 +527,36 @@ function get_post( $post = null, $output = OBJECT, $filter = 'raw' ) {
 			$_post = new WP_Post( $post );
 		} else {
 			$_post = WP_Post::get_instance( $post->ID );
+=======
+// Retrieves post data given a post ID or post object.
+// Handles post caching.
+function &get_post(&$post, $output = OBJECT, $filter = 'raw') {
+	global $post_cache, $wpdb, $blog_id;
+
+	if ( empty($post) ) {
+		if ( isset($GLOBALS['post']) )
+			$_post = & $GLOBALS['post'];
+		else
+			$_post = null;
+	} elseif ( is_object($post) ) {
+		if ( 'page' == $post->post_type )
+			return get_page($post, $output, $filter);
+		if ( !isset($post_cache[$blog_id][$post->ID]) )
+			$post_cache[$blog_id][$post->ID] = &$post;
+		$_post = & $post_cache[$blog_id][$post->ID];
+	} else {
+		$post = (int) $post;
+		if ( isset($post_cache[$blog_id][$post]) )
+			$_post = & $post_cache[$blog_id][$post];
+		elseif ( $_post = wp_cache_get($post, 'pages') )
+			return get_page($_post, $output, $filter);
+		else {
+			$query = "SELECT * FROM $wpdb->posts WHERE ID = '$post' LIMIT 1";
+			$_post = & $wpdb->get_row($query);
+			if ( 'page' == $_post->post_type )
+				return get_page($_post, $output, $filter);
+			$post_cache[$blog_id][$post] = & $_post;
+>>>>>>> origin/2.3-branch
 		}
 	} else {
 		$_post = WP_Post::get_instance( $post );
@@ -3998,9 +4029,19 @@ function wp_transition_post_status( $new_status, $old_status, $post ) {
 	do_action( "{$new_status}_{$post->post_type}", $post->ID, $post );
 }
 
+<<<<<<< HEAD
 //
 // Comment, trackback, and pingback functions.
 //
+=======
+function sanitize_post($post, $context = 'display') {
+
+	if ( 'raw' == $context )
+		return $post;
+
+	// TODO: Use array keys instead of hard coded list
+	$fields = array('post_author', 'post_date', 'post_date_gmt', 'post_content', 'post_content_filtered', 'post_title', 'post_excerpt', 'post_status', 'post_type', 'comment_status', 'ping_status', 'post_password', 'post_name', 'to_ping', 'pinged', 'post_date', 'post_date_gmt', 'post_parent', 'menu_order', 'post_mime_type', 'post_category');
+>>>>>>> origin/2.3-branch
 
 /**
  * Add a URL to those already pinged.
@@ -4869,6 +4910,7 @@ function wp_delete_attachment( $post_id, $force_delete = false ) {
 	if ( 'attachment' != $post->post_type )
 		return false;
 
+<<<<<<< HEAD
 	if ( !$force_delete && EMPTY_TRASH_DAYS && MEDIA_TRASH && 'trash' != $post->post_status )
 		return wp_trash_post( $post_id );
 
@@ -4878,6 +4920,52 @@ function wp_delete_attachment( $post_id, $force_delete = false ) {
 	$meta = wp_get_attachment_metadata( $post_id );
 	$backup_sizes = get_post_meta( $post->ID, '_wp_attachment_backup_sizes', true );
 	$file = get_attached_file( $post_id );
+=======
+// Retrieves page data given a page ID or page object.
+// Handles page caching.
+function &get_page(&$page, $output = OBJECT, $filter = 'raw') {
+	global $wpdb, $blog_id;
+
+	if ( empty($page) ) {
+		if ( isset( $GLOBALS['page'] ) && isset( $GLOBALS['page']->ID ) ) {
+			$_page = & $GLOBALS['page'];
+			wp_cache_add($_page->ID, $_page, 'pages');
+		} else {
+			// shouldn't we just return NULL at this point? ~ Mark
+			$_page = null;
+		}
+	} elseif ( is_object($page) ) {
+		if ( 'post' == $page->post_type )
+			return get_post($page, $output, $filter);
+		wp_cache_add($page->ID, $page, 'pages');
+		$_page = $page;
+	} else {
+		$page = (int) $page;
+		// first, check the cache
+		if ( ! ( $_page = wp_cache_get($page, 'pages') ) ) {
+			// not in the page cache?
+			if ( isset($GLOBALS['page']->ID) && ($page == $GLOBALS['page']->ID) ) { // for is_page() views
+				// I don't think this code ever gets executed ~ Mark
+				$_page = & $GLOBALS['page'];
+				wp_cache_add($_page->ID, $_page, 'pages');
+			} elseif ( isset($GLOBALS['post_cache'][$blog_id][$page]) ) { // it's actually a page, and is cached
+				return get_post($page, $output, $filter);
+			} else { // it's not in any caches, so off to the DB we go
+				// Why are we using assignment for this query?
+				$_page = & $wpdb->get_row("SELECT * FROM $wpdb->posts WHERE ID= '$page' LIMIT 1");
+				if ( 'post' == $_page->post_type )
+					return get_post($_page, $output, $filter);
+				// Potential issue: we're not checking to see if the post_type = 'page'
+				// So all non-'post' posts will get cached as pages.
+				wp_cache_add($_page->ID, $_page, 'pages');
+			}
+		}
+	}
+
+	$_page = sanitize_post($_page, $filter);
+
+	// at this point, one way or another, $_post contains the page object
+>>>>>>> origin/2.3-branch
 
 	if ( is_multisite() )
 		delete_transient( 'dirsize_cache' );
@@ -5034,6 +5122,7 @@ function wp_get_attachment_url( $post_id = 0 ) {
 	if ( 'attachment' != $post->post_type )
 		return false;
 
+<<<<<<< HEAD
 	$url = '';
 	// Get attached file.
 	if ( $file = get_post_meta( $post->ID, '_wp_attached_file', true ) ) {
@@ -5049,6 +5138,22 @@ function wp_get_attachment_url( $post_id = 0 ) {
 			} else {
 				// It's a newly-uploaded file, therefore $file is relative to the basedir.
 				$url = $uploads['baseurl'] . "/$file";
+=======
+	$inclusions = '';
+	if ( !empty($include) ) {
+		$child_of = 0; //ignore child_of, exclude, meta_key, and meta_value params if using include
+		$exclude = '';
+		$meta_key = '';
+		$meta_value = '';
+		$hierarchical = false;
+		$incpages = preg_split('/[\s,]+/',$include);
+		if ( count($incpages) ) {
+			foreach ( $incpages as $incpage ) {
+				if (empty($inclusions))
+					$inclusions = ' AND ( ID = ' . intval($incpage) . ' ';
+				else
+					$inclusions .= ' OR ID = ' . intval($incpage) . ' ';
+>>>>>>> origin/2.3-branch
 			}
 		}
 	}
@@ -5082,6 +5187,7 @@ function wp_get_attachment_url( $post_id = 0 ) {
 	return $url;
 }
 
+<<<<<<< HEAD
 /**
  * Retrieves the caption for an attachment.
  *
@@ -5095,6 +5201,10 @@ function wp_get_attachment_caption( $post_id = 0 ) {
 	if ( ! $post = get_post( $post_id ) ) {
 		return false;
 	}
+=======
+	if ( empty($pages) )
+		return apply_filters('get_pages', array(), $r);
+>>>>>>> origin/2.3-branch
 
 	if ( 'attachment' !== $post->post_type ) {
 		return false;

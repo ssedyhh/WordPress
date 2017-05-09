@@ -547,6 +547,7 @@ function wpautop( $pee, $br = true ) {
 
 	// If an opening or closing block element tag is followed by a closing <p> tag, remove it.
 	$pee = preg_replace('!(</?' . $allblocks . '[^>]*>)\s*</p>!', "$1", $pee);
+<<<<<<< HEAD
 
 	// Optionally insert line breaks.
 	if ( $br ) {
@@ -560,6 +561,11 @@ function wpautop( $pee, $br = true ) {
 		$pee = preg_replace('|(?<!<br />)\s*\n|', "<br />\n", $pee);
 
 		// Replace newline placeholders with newlines.
+=======
+	if ($br) {
+		$pee = preg_replace_callback('/<(script|style).*?<\/\\1>/s', create_function('$matches', 'return str_replace("\n", "<WPPreserveNewline />", $matches[0]);'), $pee);
+		$pee = preg_replace('|(?<!<br />)\s*\n|', "<br />\n", $pee); // optionally make line breaks
+>>>>>>> origin/2.3-branch
 		$pee = str_replace('<WPPreserveNewline />', "\n", $pee);
 	}
 
@@ -2647,6 +2653,7 @@ function make_clickable( $text ) {
 	return preg_replace( '#(<a([ \r\n\t]+[^>]+?>|>))<a [^>]+?>([^>]+?)</a></a>#i', "$1$3</a>", $r );
 }
 
+<<<<<<< HEAD
 /**
  * Breaks a string into chunks by splitting at whitespace characters.
  * The length of each returned chunk is as close to the specified length goal as possible,
@@ -2701,6 +2708,41 @@ function _split_str_by_whitespace( $string, $goal ) {
 	}
 
 	return $chunks;
+=======
+function _make_url_clickable_cb($matches) {
+	$url = $matches[2];
+	$url = clean_url($url);
+	if ( empty($url) )
+		return $matches[0];
+	return $matches[1] . "<a href=\"$url\" rel=\"nofollow\">$url</a>";
+}
+
+function _make_web_ftp_clickable_cb($matches) {
+	$dest = $matches[2];
+	$dest = 'http://' . $dest;
+	$dest = clean_url($dest);
+	if ( empty($dest) )
+		return $matches[0];
+
+	return $matches[1] . "<a href=\"$dest\" rel=\"nofollow\">$dest</a>";
+}
+
+function _make_email_clickable_cb($matches) {
+	$email = $matches[2] . '@' . $matches[3];
+	return $matches[1] . "<a href=\"mailto:$email\">$email</a>";
+}
+
+function make_clickable($ret) {
+	$ret = ' ' . $ret;
+	// in testing, using arrays here was found to be faster
+	$ret = preg_replace_callback('#([\s>])([\w]+?://[\w\#$%&~/.\-;:=,?@\[\]+]*)#is', '_make_url_clickable_cb', $ret);
+	$ret = preg_replace_callback('#([\s>])((www|ftp)\.[\w\#$%&~/.\-;:=,?@\[\]+]*)#is', '_make_web_ftp_clickable_cb', $ret);
+	$ret = preg_replace_callback('#([\s>])([.0-9a-z_+-]+)@(([0-9a-z-]+\.)+[0-9a-z]{2,})#i', '_make_email_clickable_cb', $ret);
+	// this one is not in an array because we need it to run last, for cleanup of accidental links within links
+	$ret = preg_replace("#(<a( [^>]+?>|>))<a [^>]+?>([^>]+?)</a></a>#i", "$1$3</a>", $ret);
+	$ret = trim($ret);
+	return $ret;
+>>>>>>> origin/2.3-branch
 }
 
 /**
@@ -3750,6 +3792,7 @@ function esc_sql( $data ) {
 	return $wpdb->_escape( $data );
 }
 
+<<<<<<< HEAD
 /**
  * Checks and cleans a URL.
  *
@@ -3766,6 +3809,9 @@ function esc_sql( $data ) {
  * @return string The cleaned $url after the {@see 'clean_url'} filter is applied.
  */
 function esc_url( $url, $protocols = null, $_context = 'display' ) {
+=======
+function clean_url( $url, $protocols = null, $context = 'display' ) {
+>>>>>>> origin/2.3-branch
 	$original_url = $url;
 
 	if ( '' == $url )
@@ -3792,6 +3838,7 @@ function esc_url( $url, $protocols = null, $_context = 'display' ) {
 		! preg_match('/^[a-z0-9-]+?\.php/i', $url) )
 		$url = 'http://' . $url;
 
+<<<<<<< HEAD
 	// Replace ampersands and single quotes only when displaying.
 	if ( 'display' == $_context ) {
 		$url = wp_kses_normalize_entities( $url );
@@ -3869,6 +3916,22 @@ function esc_url( $url, $protocols = null, $_context = 'display' ) {
  */
 function esc_url_raw( $url, $protocols = null ) {
 	return esc_url( $url, $protocols, 'db' );
+=======
+	// Replace ampersands ony when displaying.
+	if ( 'display' == $context )
+		$url = preg_replace('/&([^#])(?![a-z]{2,8};)/', '&#038;$1', $url);
+
+	if ( !is_array($protocols) )
+		$protocols = array('http', 'https', 'ftp', 'ftps', 'mailto', 'news', 'irc', 'gopher', 'nntp', 'feed', 'telnet');
+	if ( wp_kses_bad_protocol( $url, $protocols ) != $url )
+		return '';
+
+	return apply_filters('clean_url', $url, $original_url, $context);
+}
+
+function sanitize_url( $url, $protocols = null ) {
+	return clean_url( $url, $protocols, 'db');
+>>>>>>> origin/2.3-branch
 }
 
 /**

@@ -13,12 +13,17 @@ $wp_version = '4.8-alpha-40588';
  */
 $wp_db_version = 38590;
 
+<<<<<<< HEAD
 /**
  * Holds the TinyMCE version
  *
  * @global string $tinymce_version
  */
 $tinymce_version = '4600-20170506';
+=======
+$wp_version = '2.3.3';
+$wp_db_version = 6124;
+>>>>>>> origin/2.3-branch
 
 /**
  * Holds the required PHP version

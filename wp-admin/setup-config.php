@@ -14,10 +14,16 @@
  */
 define('WP_INSTALLING', true);
 
+<<<<<<< HEAD
 /**
  * We are blissfully unaware of anything.
  */
 define('WP_SETUP_CONFIG', true);
+=======
+require_once('../wp-includes/compat.php');
+require_once('../wp-includes/functions.php');
+require_once('../wp-includes/classes.php');
+>>>>>>> origin/2.3-branch
 
 /**
  * Disable error reporting
@@ -263,9 +269,18 @@ switch($step) {
 	define('DB_HOST', $dbhost);
 	/**#@-*/
 
+<<<<<<< HEAD
 	// Re-construct $wpdb with these new values.
 	unset( $wpdb );
 	require_wp_db();
+=======
+	// We'll fail here if the values are no good.
+	require_once('../wp-includes/wp-db.php');
+	if ( !empty($wpdb->error) )
+		wp_die($wpdb->error->get_error_message());
+
+	$handle = fopen('../wp-config.php', 'w');
+>>>>>>> origin/2.3-branch
 
 	/*
 	 * The wpdb constructor bails when WP_SETUP_CONFIG is set, so we must
